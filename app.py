@@ -12,7 +12,7 @@ mcp = FastMCP("R.E.A.C.T. AI Railway Safety Protocol Interface")
 # -----------------------------
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 db_client = MongoClient(MONGO_URI)
-db = db_client["railway_safety"]
+db = db_client["railway_emergency"]
 
 # -----------------------------
 # Tool 1 - Freeze Corridor
