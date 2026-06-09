@@ -26,3 +26,4 @@ try:
 except Exception as e:
     print("\n❌ ERROR: Could not connect to MongoDB.")
     print(e, "\n")
+    
