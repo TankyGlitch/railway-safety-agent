@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["python", "app.py"]
+CMD ["fastmcp", "run", "app.py", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "8080"]
