@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from google import genai
 
-load_dotenv()
+load_dotenv("frontend/.env.local")
 from app import (
     freeze_corridor,
     dispatch_emergency_responders,
