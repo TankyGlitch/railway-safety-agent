@@ -21,6 +21,8 @@ ${message}
 Provide a professional railway emergency response.
 `,
     });
+    console.log("Gemini Response:");
+    console.log(response.text);
 
     return NextResponse.json({
       reply: response.text,
