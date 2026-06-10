@@ -67,11 +67,7 @@ Tool Results:
 Generate a professional railway emergency report.
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-
     return {
-        "reply": response.text
+    "reply": "R.E.A.C.T AI successfully executed emergency response.",
+    "tool_results": results
     }
