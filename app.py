@@ -47,32 +47,39 @@ print("=" * 60)
 # Debug Tool
 # -----------------------------
 @mcp.tool()
+
 def check_database_connection() -> dict:
     """
-    Verify MongoDB connection and environment variables.
+    Verify MongoDB connection and return exact error.
     """
 
     try:
-        mongo_exists = bool(os.getenv("MONGO_URI"))
+        mongo_uri = os.getenv("MONGO_URI")
 
-        if db is None:
+        if not mongo_uri:
             return {
-                "mongo_uri_present": mongo_exists,
+                "mongo_uri_present": False,
                 "database_connected": False
             }
 
-        db.command("ping")
+        client = MongoClient(
+            mongo_uri,
+            serverSelectionTimeoutMS=5000
+        )
+
+        client.admin.command("ping")
 
         return {
-            "mongo_uri_present": mongo_exists,
+            "mongo_uri_present": True,
             "database_connected": True
         }
 
     except Exception as e:
         return {
-            "mongo_uri_present": mongo_exists,
+            "mongo_uri_present": True,
             "database_connected": False,
-            "error": str(e)
+            "error": str(e),
+            "error_type": type(e).__name__
         }
 # -----------------------------
 # Tool 1 - Freeze Corridor
