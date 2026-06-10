@@ -10,10 +10,70 @@ mcp = FastMCP("R.E.A.C.T. AI Railway Safety Protocol Interface")
 # -----------------------------
 # Database Connection
 # -----------------------------
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-db_client = MongoClient(MONGO_URI)
-db = db_client["railway_emergency"]
 
+MONGO_URI = os.getenv("MONGO_URI")
+
+print("=" * 60)
+print("MONGO_URI FOUND:", bool(MONGO_URI))
+
+db_client = None
+db = None
+
+if not MONGO_URI:
+    print("ERROR: MONGO_URI environment variable not found")
+
+else:
+    try:
+        db_client = MongoClient(
+            MONGO_URI,
+            serverSelectionTimeoutMS=5000
+        )
+
+        # Force Atlas connection during startup
+        db_client.server_info()
+
+        print("MongoDB connection successful")
+
+        db = db_client["railway_emergency"]
+
+    except Exception as e:
+        print("MongoDB connection failed:")
+        print(str(e))
+
+print("=" * 60)
+
+
+# -----------------------------
+# Debug Tool
+# -----------------------------
+@mcp.tool()
+def check_database_connection() -> dict:
+    """
+    Verify MongoDB connection and environment variables.
+    """
+
+    try:
+        mongo_exists = bool(os.getenv("MONGO_URI"))
+
+        if db is None:
+            return {
+                "mongo_uri_present": mongo_exists,
+                "database_connected": False
+            }
+
+        db.command("ping")
+
+        return {
+            "mongo_uri_present": mongo_exists,
+            "database_connected": True
+        }
+
+    except Exception as e:
+        return {
+            "mongo_uri_present": mongo_exists,
+            "database_connected": False,
+            "error": str(e)
+        }
 # -----------------------------
 # Tool 1 - Freeze Corridor
 # -----------------------------
