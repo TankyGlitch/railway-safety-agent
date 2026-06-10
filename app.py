@@ -4,6 +4,22 @@ from fastmcp import FastMCP
 from dotenv import load_dotenv
 
 load_dotenv()
+mcp = FastMCP("R.E.A.C.T. AI Railway Safety Protocol Interface")
+
+def get_db():
+    mongo_uri = os.getenv("MONGO_URI")
+
+    if not mongo_uri:
+        raise Exception("MONGO_URI not configured")
+
+    client = MongoClient(
+        mongo_uri,
+        serverSelectionTimeoutMS=5000
+    )
+
+    client.admin.command("ping")
+
+    return client["railway_emergency"]
 
 mcp = FastMCP("R.E.A.C.T. AI Railway Safety Protocol Interface")
 
@@ -48,35 +64,20 @@ print("=" * 60)
 # -----------------------------
 @mcp.tool()
 
+
 def check_database_connection() -> dict:
-    """
-    Verify MongoDB connection and return exact error.
-    """
-
     try:
-        mongo_uri = os.getenv("MONGO_URI")
-
-        if not mongo_uri:
-            return {
-                "mongo_uri_present": False,
-                "database_connected": False
-            }
-
-        client = MongoClient(
-            mongo_uri,
-            serverSelectionTimeoutMS=5000
-        )
-
-        client.admin.command("ping")
+        db = get_db()
 
         return {
             "mongo_uri_present": True,
-            "database_connected": True
+            "database_connected": True,
+            "database_name": db.name
         }
 
     except Exception as e:
         return {
-            "mongo_uri_present": True,
+            "mongo_uri_present": bool(os.getenv("MONGO_URI")),
             "database_connected": False,
             "error": str(e),
             "error_type": type(e).__name__
@@ -85,12 +86,11 @@ def check_database_connection() -> dict:
 # Tool 1 - Freeze Corridor
 # -----------------------------
 @mcp.tool()
+@mcp.tool()
 def freeze_corridor(sector: str) -> dict:
-    """
-    Emergency halt all active trains in a sector.
-    """
-
     try:
+        db = get_db()
+
         query = {
             "current_sector": sector,
             "status": {
@@ -145,6 +145,7 @@ def dispatch_emergency_responders(sector: str) -> dict:
     """
 
     try:
+        db = get_db()
         responders = list(
             db["responders"].find(
                 {"jurisdiction_sectors": sector}
@@ -185,6 +186,7 @@ def locate_medical_facilities(sector: str) -> dict:
     """
 
     try:
+        db = get_db()
         hospitals = list(
             db["hospitals"].find(
                 {"sectors_covered": sector}
