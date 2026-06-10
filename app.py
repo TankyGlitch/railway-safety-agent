@@ -256,6 +256,20 @@ def generate_incident_report(
         "status": "Generated"
     }
 
+@mcp.tool()
+def list_collections() -> dict:
+    try:
+        db = get_db()
+
+        return {
+            "database": db.name,
+            "collections": db.list_collection_names()
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
 
 # -----------------------------
 # MCP Server
