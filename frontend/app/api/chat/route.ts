@@ -14,6 +14,11 @@ export async function POST(req: Request) {
       }),
     });
 
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text);
+    }
+
     const data = await response.json();
 
     return NextResponse.json({
@@ -22,7 +27,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Backend Error:", error);
 
     return NextResponse.json(
       {
