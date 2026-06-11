@@ -31,22 +31,10 @@ def chat(req: ChatRequest):
     results = []
 
     if "derail" in msg:
-        results.append(
-            freeze_corridor("Dhanbad-Zone")
-        )
-
-        results.append(
-            dispatch_emergency_responders("Dhanbad-Zone")
-        )
-
-        results.append(
-            locate_medical_facilities("Dhanbad-Zone")
-        )
-
-        results.append(
-            dispatch_engineering_team("Dhanbad-Zone")
-        )
-
+        results.append(freeze_corridor("Dhanbad-Zone"))
+        results.append(dispatch_emergency_responders("Dhanbad-Zone"))
+        results.append(locate_medical_facilities("Dhanbad-Zone"))
+        results.append(dispatch_engineering_team("Dhanbad-Zone"))
         results.append(
             generate_incident_report(
                 "Derailment",
@@ -67,7 +55,12 @@ Tool Results:
 Generate a professional railway emergency report.
 """
 
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
+    )
+
     return {
-    "reply": "R.E.A.C.T AI successfully executed emergency response.",
-    "tool_results": results
+        "reply": response.text,
+        "tool_results": results
     }
