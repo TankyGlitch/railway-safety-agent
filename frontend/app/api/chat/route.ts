@@ -1,39 +1,32 @@
-import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const message = body.message;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `
-You are R.E.A.C.T AI.
-
-User message:
-${message}
-
-Provide a professional railway emergency response.
-`,
+    const response = await fetch("http://127.0.0.1:8000/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: body.message,
+      }),
     });
-    console.log("Gemini Response:");
-    console.log(response.text);
+
+    const data = await response.json();
 
     return NextResponse.json({
-      reply: response.text,
+      reply: data.reply,
       toolEvents: [],
     });
+
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       {
-        reply: "Failed to contact Gemini.",
+        reply: "Failed to contact R.E.A.C.T AI backend.",
       },
       { status: 500 }
     );
